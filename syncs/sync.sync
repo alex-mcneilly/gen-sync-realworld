@@ -1,0 +1,11 @@
+when Sync.run(action, arguments)
+     Concept.extract(action) -> concept
+     State.hasState(concept) -> true
+sync State.get(concept) -> before
+     Sync.invoke(action, before, arguments) -> after, returns
+     State.compare(before, after) -> diff
+     State.update(concept, diff)
+
+when State.update(concept, diff)
+     MongoDB.getCollection(concept) -> collection
+sync MongoDB.updateByDiff(collection, diff)

@@ -1,0 +1,49 @@
+when API.request("create_user", username, email, password) -> request_id
+sync User.signup(username, email, password) -> user_id
+     User.get(user_id) -> user
+     Profile.create(user_id) -> profile
+     JWT.create(user_id) -> token
+     Map.merge(user, profile, token) -> response
+     API.respond(request_id, response)
+
+when API.request("login_user", email, password) -> request_id
+sync User.login(email, password) -> user_id
+     User.get(user_id) -> user
+     Profile.get(user_id) -> profile
+     JWT.create(user_id) -> token
+     Map.merge(user, profile, token) -> response
+     API.respond(request_id, response)
+
+when API.request("get_user", token) -> request_id
+sync JWT.verify(token) -> user_id
+     User.get(user_id) -> user
+     Profile.get(user_id) -> profile
+     Map.merge(user, profile, token) -> response
+     API.respond(request_id, response)
+
+when API.request("update_user", token, username, email, password, bio, image) -> request_id
+sync JWT.verify(token) -> user_id
+     User.update(user_id, username, email, password) -> user
+     Profile.update(user_id, bio, image) -> profile
+     Map.merge(user, profile, token) -> response
+     API.respond(request_id, response)
+
+when API.request("get_profile", username) -> request_id
+sync User.usernameToId(username) -> user_id
+     Profile.get(user_id) -> response
+     API.respond(request_id, response)
+
+when API.request("follow_user", token, target) -> request_id
+sync JWT.verify(token) -> user_id
+     User.usernameToId(target) -> target_id
+     Follows.create(user_id, target_id)
+     Profile.get(target_id) -> response
+     API.respond(request_id, response)
+
+when API.request("unfollow_user", token, target) -> request_id
+sync JWT.verify(token) -> user_id
+     User.usernameToId(target) -> target_id
+     Follows.delete(user_id, target_id)
+     Profile.get(target_id) -> response
+     API.respond(request_id, response)
+
