@@ -4,6 +4,8 @@ interface Token {
     token: string;
 }
 
+const aud = "sync-realworld";
+
 // New key on server start
 const key = await crypto.subtle.generateKey(
     { name: "HMAC", hash: "SHA-512" },
@@ -12,8 +14,8 @@ const key = await crypto.subtle.generateKey(
 );
 
 export default class JWTConcept {
-    async create(user_id: string) {
-        const payload = { user_id };
+    async make(user_id: string) {
+        const payload = { user_id, aud };
         const token = await create({ alg: "HS512", typ: "JWT" }, payload, key);
         return { token };
     }

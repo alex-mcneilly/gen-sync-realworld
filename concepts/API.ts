@@ -7,14 +7,14 @@ interface Request {
     arguments: [string];
 }
 // {request_id: request}
-type Requests = Record<string, Request>;
+export type Requests = Record<string, Request>;
 
 export default class APIConcept {
     request(state: Requests, method: string, ...args: [string]) {
         const created_epoch_ms = Date.now();
         const id = crypto.randomUUID();
         state[id] = { id, created_epoch_ms, method, arguments: args };
-        return id;
+        return [state, id];
     }
     respond(state: Requests, request_id: string, response: object) {
         const request = state[request_id];
@@ -22,5 +22,6 @@ export default class APIConcept {
             ...request,
             ...{ response, completed_epoch_ms: Date.now() },
         };
+        return [state];
     }
 }

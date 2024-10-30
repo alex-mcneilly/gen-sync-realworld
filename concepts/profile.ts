@@ -9,13 +9,13 @@ export default class ProfileConcept {
     create(state: Profiles, user_id: string) {
         const profile = { bio: "", image: "" };
         state[user_id] = profile;
-        return profile;
+        return [state, profile];
     }
     get(state: Profiles, user_id: string) {
-        return state[user_id];
+        return [state, state[user_id]];
     }
     update(state: Profiles, user_id: string, bio?: string, image?: string) {
-        const profile = this.get(state, user_id);
+        const [, profile] = this.get(state, user_id);
         if (profile === undefined) {
             throw Error("Profile not found");
         }
@@ -25,5 +25,6 @@ export default class ProfileConcept {
         if (image !== undefined) {
             profile.image = image;
         }
+        return [state, profile];
     }
 }

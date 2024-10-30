@@ -9,6 +9,7 @@ export default class FollowsConcept {
         } else {
             state[user_id].push(target_id);
         }
+        return [state];
     }
     delete(state: Follows, user_id: string, target_id: string) {
         const following = state[user_id];
@@ -17,5 +18,6 @@ export default class FollowsConcept {
             throw Error("Target not found");
         }
         state[user_id].splice(idx, 1);
+        return [state];
     }
 }

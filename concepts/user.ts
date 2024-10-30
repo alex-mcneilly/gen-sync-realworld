@@ -21,59 +21,66 @@ export default class UserConcept {
         email: string,
         password: string,
     ) {
-        if (this.getByUsername(state, username) === undefined) {
-            throw Error("User already exists");
-        } else if (username.length === 0 || password.length === 0) {
-            throw Error("Username/Password must not be empty");
+        try {
+            // If user does not exist, this should throw
+            const _existing = this.getByUsername(state, username);
+        } catch {
+            if (username.length === 0 || password.length === 0) {
+                throw Error("Username/Password must not be empty");
+            }
+            const user_id = crypto.randomUUID();
+            const hashed = await bcrypt.hash(password);
+            const user = { username, email, password: hashed };
+            state[user_id] = user;
+            return [state, user_id];
         }
-        const user_id = crypto.randomUUID();
-        const hashed = await bcrypt.hash(password);
-        const user = { username, email, password: hashed };
-        state[user_id] = user;
-        return sanitize(user);
+        // This means user exists
+        throw Error("User already exists");
     }
     get(state: Users, user_id: string) {
         const user = state[user_id];
         if (user === undefined) {
             throw Error("User not found");
         }
-        return sanitize(user);
+        return [state, sanitize(user)];
     }
     getByUsername(state: Users, username: string) {
-        const user = Object.values(state).find((user) =>
-            user.username === username
-        );
+        const user = Object.values(state).find((user) => {
+            return user.username === username;
+        });
         if (user === undefined) {
             throw Error("User not found");
         }
-        return sanitize(user);
+        return [state, sanitize(user)];
     }
     // Email is both private and login, we do not sanitize
-    getByEmail(state: Users, email: string) {
-        const user = Object.values(state).find((user) => user.email === email);
-        if (user === undefined) {
-            throw Error("User not found");
-        }
-        return user;
-    }
-    usernameToId(state: Users, username: string) {
+    getByEmail(state: Users, email: string): [Users, [string, User]] {
         const found = Object.entries(state).find(([, user]) => {
-            user.username === username;
+            return user.email === email;
         });
         if (found === undefined) {
             throw Error("User not found");
         }
-        return found[0];
+        return [state, found];
+    }
+    usernameToId(state: Users, username: string) {
+        const found = Object.entries(state).find(([, user]) => {
+            return user.username === username;
+        });
+        if (found === undefined) {
+            throw Error("User not found");
+        }
+        return [state, found[0]];
     }
     async login(state: Users, email: string, password: string) {
-        const user = this.getByEmail(state, email);
+        const [_, [user_id, user]] = this.getByEmail(state, email);
         if (user === undefined) {
             throw Error("User not found");
         }
         if (await bcrypt.compare(password, user.password) === false) {
             throw Error("Incorrect password");
         }
-        return sanitize(user);
+        return [state, user_id];
     }
     update(
         state: Users,
@@ -108,6 +115,6 @@ export default class UserConcept {
             }
             user.password = password;
         }
-        return sanitize(user);
+        return [state, sanitize(user)];
     }
 }
