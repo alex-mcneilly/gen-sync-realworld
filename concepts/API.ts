@@ -1,3 +1,5 @@
+import uuid from "../imports/uuid.ts";
+
 interface Request {
     id: string;
     method: string;
@@ -12,7 +14,7 @@ export type Requests = Record<string, Request>;
 export default class APIConcept {
     request(state: Requests, method: string, ...args: [string]) {
         const created_epoch_ms = Date.now();
-        const id = crypto.randomUUID();
+        const id = uuid();
         state[id] = { id, created_epoch_ms, method, arguments: args };
         return [state, id];
     }

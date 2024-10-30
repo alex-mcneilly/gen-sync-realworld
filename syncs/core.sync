@@ -57,3 +57,7 @@ sync Sync.invoke(action, before, arguments) -> after, returns
 when Sync.run(action, arguments)
      Operational.lookup(action) -> operation
 sync Sync.execute(operation, arguments) -> returns
+
+when State.update(concept, diff)
+     MongoDB.getCollection(concept) -> collection
+sync MongoDB.update(collection, diff)

@@ -14,6 +14,7 @@ import MapConcept from "./operational/map.ts";
 import ConceptConcept from "./operational/concept.ts";
 import StateConcept from "./operational/state.ts";
 import OperationalConcept from "./operational/operational.ts";
+import MongoDBConcept from "./operational/MongoDB.ts";
 
 // Initialize concepts
 const API = new APIConcept();
@@ -23,6 +24,7 @@ const Follows = new FollowsConcept();
 const JWT = new JWTConcept();
 const Mapping = new MapConcept();
 const Concept = new ConceptConcept();
+const MongoDB = new MongoDBConcept();
 // Initialize state
 const states = { User: {}, API: {}, Follows: {}, Profile: {} };
 const State = new StateConcept(states);
@@ -38,28 +40,39 @@ const sync_file = Deno.readTextFileSync(path.join(base_path, sync_path));
 
 // Initialize synchronizer
 const Sync = new Synchronizer(
-  [API, User, Profile, Follows, JWT, Mapping, Concept, State, Operation],
+  [
+    API,
+    User,
+    Profile,
+    Follows,
+    JWT,
+    Mapping,
+    Concept,
+    State,
+    Operation,
+    MongoDB,
+  ],
   sync_file,
 );
 
 async function makeRequest(action: string, ...args: unknown[]) {
-  // try {
-  //   const request_id = await Sync.run("API.request", [action, ...args]);
-  //   if (typeof request_id === "string") {
-  //     const response = (State.get("API") as Requests)[request_id].response;
-  //     return response;
-  //   }
-  // } catch (error) {
-  //   if (error instanceof Error) {
-  //     // throw new HTTPException(401, { message: error.message });
-  //     throw Error(error.message);
-  //   }
-  // }
-  const request_id = await Sync.run("API.request", [action, ...args]);
-  if (typeof request_id === "string") {
-    const response = (State.get("API") as Requests)[request_id].response;
-    return response;
+  try {
+    const request_id = await Sync.run("API.request", [action, ...args]);
+    if (typeof request_id === "string") {
+      const response = (State.get("API") as Requests)[request_id].response;
+      return response;
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      // throw new HTTPException(401, { message: error.message });
+      throw Error(error.message);
+    }
   }
+  // const request_id = await Sync.run("API.request", [action, ...args]);
+  // if (typeof request_id === "string") {
+  //   const response = (State.get("API") as Requests)[request_id].response;
+  //   return response;
+  // }
 }
 // console.dir(Sync.syncs, { depth: null });
 

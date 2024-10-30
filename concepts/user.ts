@@ -1,4 +1,5 @@
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+import uuid from "../imports/uuid.ts";
 
 interface User {
     username: string;
@@ -28,7 +29,7 @@ export default class UserConcept {
             if (username.length === 0 || password.length === 0) {
                 throw Error("Username/Password must not be empty");
             }
-            const user_id = crypto.randomUUID();
+            const user_id = uuid();
             const hashed = await bcrypt.hash(password);
             const user = { username, email, password: hashed };
             state[user_id] = user;
