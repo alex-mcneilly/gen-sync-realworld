@@ -64,8 +64,8 @@ async function makeRequest(action: string, ...args: unknown[]) {
     }
   } catch (error) {
     if (error instanceof Error) {
-      // throw new HTTPException(401, { message: error.message });
-      throw Error(error.message);
+      throw new HTTPException(401, { message: error.message });
+      // throw Error(error.message);
     }
   }
   // const request_id = await Sync.run("API.request", [action, ...args]);
@@ -138,7 +138,7 @@ app.get("/user", async (ctx) => {
 });
 */
 
-app.get("*", async (ctx) => {
+app.get("*", (ctx) => {
   console.dir(ctx.req, { depth: null });
   return ctx.text(ctx.req.method);
 });

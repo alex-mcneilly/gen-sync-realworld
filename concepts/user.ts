@@ -22,21 +22,15 @@ export default class UserConcept {
         email: string,
         password: string,
     ) {
-        try {
-            // If user does not exist, this should throw
-            const _existing = this.getByUsername(state, username);
-        } catch {
-            if (username.length === 0 || password.length === 0) {
-                throw Error("Username/Password must not be empty");
-            }
-            const user_id = uuid();
-            const hashed = await bcrypt.hash(password);
-            const user = { username, email, password: hashed };
-            state[user_id] = user;
-            return [state, user_id];
+        this.checkUnique(state, username, email);
+        if (username.length === 0 || password.length === 0) {
+            throw Error("Username/Password must not be empty");
         }
-        // This means user exists
-        throw Error("User already exists");
+        const user_id = uuid();
+        const hashed = await bcrypt.hash(password);
+        const user = { username, email, password: hashed };
+        state[user_id] = user;
+        return [state, user_id];
     }
     get(state: Users, user_id: string) {
         const user = state[user_id];
@@ -72,6 +66,18 @@ export default class UserConcept {
             throw Error("User not found");
         }
         return [state, found[0]];
+    }
+    checkUnique(state: Users, username: string, email: string) {
+        try {
+            const _username = this.getByUsername(state, username);
+        } catch {
+            try {
+                const _email = this.getByEmail(state, email);
+            } catch {
+                return true;
+            }
+        }
+        throw Error("User already exists");
     }
     async login(state: Users, email: string, password: string) {
         const [_, [user_id, user]] = this.getByEmail(state, email);
