@@ -9,12 +9,6 @@ interface User {
 // {user_id: user}
 type Users = Record<string, User>;
 
-function sanitize(user: User) {
-    // deno-lint-ignore no-unused-vars
-    const { password, ...rest } = user;
-    return rest;
-}
-
 export default class UserConcept {
     async signup(
         state: Users,
@@ -124,4 +118,10 @@ export default class UserConcept {
         }
         return [state, sanitize(user)];
     }
+}
+
+function sanitize(user: User) {
+    // deno-lint-ignore no-unused-vars
+    const { password, ...rest } = user;
+    return rest;
 }

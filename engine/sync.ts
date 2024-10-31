@@ -88,6 +88,9 @@ export default class SyncConcept {
         throw Error("Argument does not match");
       }
     });
+    if (syncArgs.length > actionArgs.length) {
+      throw Error("Sync argument length is longer");
+    }
     // Match if return bindings exist
     if (syncResult !== null) {
       // Check and match for single return binding

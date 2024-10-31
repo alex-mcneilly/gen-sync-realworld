@@ -28,23 +28,41 @@ sync JWT.verify(token) -> user_id
      Map.mergeAs("user", user, profile, token) -> response
      API.respond(request_id, response)
 
-when API.request("get_profile", username) -> request_id
-sync User.usernameToId(username) -> user_id
-     Profile.get(user_id) -> response
+when API.request("get_profile", target) -> request_id
+sync User.usernameToId(target) -> target_id
+     User.get(target_id) -> target_info
+     Profile.get(target_id) -> profile
+     Follows.doesFollow("", target_id) -> follows
+     Map.mergeAs("profile", profile, target_info, follows) -> response
+     API.respond(request_id, response)
+
+when API.request("get_profile", token, target) -> request_id
+sync JWT.verify(token) -> user_id
+     User.usernameToId(target) -> target_id
+     User.get(target_id) -> target_info
+     Profile.get(target_id) -> profile
+     Follows.doesFollow(user_id, target_id) -> follows
+     Map.mergeAs("profile", profile, target_info, follows) -> response
      API.respond(request_id, response)
 
 when API.request("follow_user", token, target) -> request_id
 sync JWT.verify(token) -> user_id
      User.usernameToId(target) -> target_id
      Follows.create(user_id, target_id)
-     Profile.get(target_id) -> response
+     Profile.get(target_id) -> profile
+     User.get(target_id) -> target_info
+     Follows.doesFollow(user_id, target_id) -> follows
+     Map.mergeAs("profile", profile, target_info, follows) -> response
      API.respond(request_id, response)
 
 when API.request("unfollow_user", token, target) -> request_id
 sync JWT.verify(token) -> user_id
      User.usernameToId(target) -> target_id
      Follows.delete(user_id, target_id)
-     Profile.get(target_id) -> response
+     Profile.get(target_id) -> profile
+     User.get(target_id) -> target_info
+     Follows.doesFollow(user_id, target_id) -> follows
+     Map.mergeAs("profile", profile, target_info, follows) -> response
      API.respond(request_id, response)
 
 when Sync.run(action, arguments)

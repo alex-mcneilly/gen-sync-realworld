@@ -1,5 +1,5 @@
 import Synchronizer from "./engine/sync.ts";
-import { Hono } from "jsr:@hono/hono";
+import { type Context, Hono } from "jsr:@hono/hono";
 import { HTTPException } from "jsr:@hono/hono/http-exception";
 import * as path from "jsr:@std/path";
 
@@ -55,6 +55,7 @@ const Sync = new Synchronizer(
   sync_file,
 );
 
+// Helper functions
 async function makeRequest(action: string, ...args: unknown[]) {
   try {
     const request_id = await Sync.run("API.request", [action, ...args]);
@@ -75,6 +76,13 @@ async function makeRequest(action: string, ...args: unknown[]) {
   // }
 }
 // console.dir(Sync.syncs, { depth: null });
+function getToken(ctx: Context) {
+  const header = ctx.req.header("Authorization");
+  if (header === undefined) {
+    throw new HTTPException(401);
+  }
+  return header.slice("Token ".length);
+}
 
 // Instantiate server
 const app = new Hono();
@@ -97,21 +105,13 @@ app.post("/users/login", async (ctx) => {
 });
 
 app.get("/user", async (ctx) => {
-  const header = ctx.req.header("Authorization");
-  if (header === undefined) {
-    throw new HTTPException(401);
-  }
-  const token = header.slice("Token ".length);
+  const token = getToken(ctx);
   const response = await makeRequest("get_user", { token });
   return ctx.json(response);
 });
 
 app.put("/user", async (ctx) => {
-  const header = ctx.req.header("Authorization");
-  if (header === undefined) {
-    throw new HTTPException(401);
-  }
-  const token = header.slice("Token ".length);
+  const token = getToken(ctx);
   const { user: { email, password, bio, image, username } } = await ctx.req
     .json();
   const response = await makeRequest(
@@ -126,13 +126,39 @@ app.put("/user", async (ctx) => {
   return ctx.json(response);
 });
 
+app.get("/profiles/:username", async (ctx) => {
+  const username = ctx.req.param("username");
+  let response, token;
+  try {
+    token = getToken(ctx);
+  } catch {
+    token = undefined;
+  }
+  if (token === undefined) {
+    response = await makeRequest("get_profile", username);
+  } else {
+    response = await makeRequest("get_profile", { token }, username);
+  }
+  return ctx.json(response);
+});
+
+app.post("/profiles/:username/follow", async (ctx) => {
+  const username = ctx.req.param("username");
+  const token = getToken(ctx);
+  const response = await makeRequest("follow_user", { token }, username);
+  return ctx.json(response);
+});
+
+app.delete("/profiles/:username/follow", async (ctx) => {
+  const username = ctx.req.param("username");
+  const token = getToken(ctx);
+  const response = await makeRequest("unfollow_user", { token }, username);
+  return ctx.json(response);
+});
+
 /*
 app.get("/user", async (ctx) => {
-  const header = ctx.req.header("Authorization");
-  if (header === undefined) {
-    throw new HTTPException(401);
-  }
-  const token = header.slice("Token ".length);
+  const token = getToken(ctx);
   const response = await makeRequest("", {token})
   return ctx.json(response);
 });
