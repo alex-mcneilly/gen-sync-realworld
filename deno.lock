@@ -5,6 +5,7 @@
     "jsr:@std/bytes@^1.0.2": "1.0.2",
     "jsr:@std/crypto@^1.0.3": "1.0.3",
     "jsr:@std/path@*": "1.0.7",
+    "jsr:@std/text@*": "1.0.8",
     "jsr:@std/uuid@*": "1.0.4",
     "npm:@types/node@*": "22.5.4",
     "npm:arcsecond@*": "5.0.0",
@@ -24,6 +25,9 @@
     },
     "@std/path@1.0.7": {
       "integrity": "76a689e07f0e15dcc6002ec39d0866797e7156629212b28f27179b8a5c3b33a1"
+    },
+    "@std/text@1.0.8": {
+      "integrity": "40ba34caa095f393e78796e5eda37b8b4e2cc6cfd6f51f34658ad7487b1451e4"
     },
     "@std/uuid@1.0.4": {
       "integrity": "f4233149cc8b4753cc3763fd83a7c4101699491f55c7be78dc7b30281946d7a0",

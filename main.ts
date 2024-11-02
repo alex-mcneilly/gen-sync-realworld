@@ -8,6 +8,10 @@ import APIConcept, { Requests } from "./concepts/API.ts";
 import UserConcept from "./concepts/user.ts";
 import ProfileConcept from "./concepts/profile.ts";
 import FollowsConcept from "./concepts/follows.ts";
+import ArticleConcept from "./concepts/article.ts";
+import TagConcept from "./concepts/tag.ts";
+import FavoritesConcept from "./concepts/favorites.ts";
+
 // Operational concept imports
 import JWTConcept from "./operational/JWT.ts";
 import MapConcept from "./operational/map.ts";
@@ -21,12 +25,23 @@ const API = new APIConcept();
 const User = new UserConcept();
 const Profile = new ProfileConcept();
 const Follows = new FollowsConcept();
+const Article = new ArticleConcept();
+const Tag = new TagConcept();
+const Favorites = new FavoritesConcept();
 const JWT = new JWTConcept();
 const Mapping = new MapConcept();
 const Concept = new ConceptConcept();
 const MongoDB = new MongoDBConcept();
 // Initialize state
-const states = { User: {}, API: {}, Follows: {}, Profile: {} };
+const states = {
+  User: {},
+  API: {},
+  Follows: {},
+  Profile: {},
+  Article: {},
+  Tag: {},
+  Favorites: {},
+};
 const State = new StateConcept(states);
 // Initialize operations
 const operations = ["JWT", "Map"];
@@ -45,6 +60,9 @@ const Sync = new Synchronizer(
     User,
     Profile,
     Follows,
+    Article,
+    Tag,
+    Favorites,
     JWT,
     Mapping,
     Concept,
@@ -125,7 +143,7 @@ app.put("/user", async (ctx) => {
   );
   return ctx.json(response);
 });
-
+// Two routes, one authenticated, one not
 app.get("/profiles/:username", async (ctx) => {
   const username = ctx.req.param("username");
   let response, token;
@@ -153,6 +171,69 @@ app.delete("/profiles/:username/follow", async (ctx) => {
   const username = ctx.req.param("username");
   const token = getToken(ctx);
   const response = await makeRequest("unfollow_user", { token }, username);
+  return ctx.json(response);
+});
+
+// Two routes, one authenticated, one not
+app.get("/articles", async (ctx) => {
+  const { tag, author, favorited, limit, offset } = ctx.req.query();
+  let response, token;
+  try {
+    token = getToken(ctx);
+  } catch {
+    token = undefined;
+  }
+  if (token === undefined) {
+    response = await makeRequest(
+      "list_articles",
+      tag,
+      author,
+      favorited,
+      limit,
+      offset,
+    );
+  } else {
+    response = await makeRequest(
+      "list_articles",
+      { token },
+      tag,
+      author,
+      favorited,
+      limit,
+      offset,
+    );
+  }
+  return ctx.json(response);
+});
+
+app.post("/articles", async (ctx) => {
+  const token = getToken(ctx);
+  const { article: { title, description, body, tagList } } = await ctx.req
+    .json();
+  const response = await makeRequest(
+    "create_article",
+    { token },
+    title,
+    description,
+    body,
+    tagList,
+  );
+  return ctx.json(response);
+});
+
+app.get("/articles/:slug", async (ctx) => {
+  const slug = ctx.req.param("slug");
+  const response = await makeRequest("get_article", slug);
+  return ctx.json(response);
+});
+
+app.get("/articles/:slug/comments", async (ctx) => {
+  const slug = ctx.req.param("slug");
+  return ctx.json({ comments: [] });
+});
+
+app.get("/tags", async (ctx) => {
+  const response = await makeRequest("get_tags");
   return ctx.json(response);
 });
 

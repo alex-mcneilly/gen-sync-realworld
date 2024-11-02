@@ -33,6 +33,14 @@ export default class UserConcept {
         }
         return [state, sanitize(user)];
     }
+    addMany(state: Users, entries: [string, object][]) {
+        const added = entries.map(([id, obj]) => {
+            const user = state[id];
+            const sanitized = user ? sanitize(user) : {};
+            return [id, { ...obj, ...sanitized }];
+        });
+        return [state, added];
+    }
     getByUsername(state: Users, username: string) {
         const user = Object.values(state).find((user) => {
             return user.username === username;
@@ -57,7 +65,8 @@ export default class UserConcept {
             return user.username === username;
         });
         if (found === undefined) {
-            throw Error("User not found");
+            // throw Error("User not found");
+            return [state, undefined];
         }
         return [state, found[0]];
     }

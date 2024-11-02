@@ -69,6 +69,8 @@ const toEndOfLine = pipeParsers([choice([regex(/^[^\S\r\n]*/), endOfInput])]);
 // Parse primitive values according to JSON specification
 const parseJsonValue = coroutine((run): unknown => {
   const value = run(everyCharUntil(anyOfString(",)\r\n")));
+  // Temporary hack for zero argument bindings
+  if (value.length === 0) return;
   return JSON.parse(value);
 });
 const booleanParser = choice([str("true"), str("false")]).map((b) =>

@@ -21,7 +21,7 @@ export default class SyncConcept {
     const self_syncs = this.mapActions([this]);
     this.actionMap = { ...concept_syncs, ...self_syncs };
     this.syncs = parse(syncInput);
-    console.dir(this.actionMap, { depth: null });
+    // console.dir(this.actionMap, { depth: null });
   }
   // Map actions from concept names to the actual methods
   // TODO: hide private methods, or find a way to properly scan only for concept actions
@@ -75,7 +75,7 @@ export default class SyncConcept {
     bindings: Bindings,
   ) {
     // console.dir(["action: ", [action, actionArgs, result]], { depth: null });
-    // console.dir(["action: ", [action, undefined, result]], { depth: null });
+    // // console.dir(["action: ", [action, undefined, result]], { depth: null });
     // console.dir(["sync: ", [syncAction, syncArgs, syncResult]], {
     //   depth: null,
     // });
@@ -250,7 +250,8 @@ export default class SyncConcept {
       }
       i++;
     }
-    console.log("Execution history:", traces);
+    console.log("Execution history:");
+    console.dir(traces, { depth: null });
     return result;
   }
 }

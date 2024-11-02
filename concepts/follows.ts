@@ -33,4 +33,11 @@ export default class FollowsConcept {
         const following = state[user_id].following.includes(target_id);
         return [state, { following }];
     }
+    addMany(state: Follows, entries: [string, object][], user_id: string) {
+        const added = entries.map(([id, obj]) => {
+            const [, follows] = this.doesFollow(state, user_id, id);
+            return [id, { ...obj, ...follows }];
+        });
+        return [state, added];
+    }
 }

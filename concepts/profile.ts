@@ -14,6 +14,13 @@ export default class ProfileConcept {
     get(state: Profiles, user_id: string) {
         return [state, state[user_id]];
     }
+    addMany(state: Profiles, entries: [string, object][]) {
+        const added = entries.map(([id, obj]) => {
+            const profile = state[id];
+            return [id, { ...obj, ...profile }];
+        });
+        return [state, added];
+    }
     update(state: Profiles, user_id: string, bio?: string, image?: string) {
         const [, profile] = this.get(state, user_id);
         if (profile === undefined) {
