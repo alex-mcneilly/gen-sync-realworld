@@ -47,7 +47,7 @@ export default class MongoDBConcept {
                 ], {
                     _id: id,
                 }, collection);
-                console.dir(updates, { depth: null });
+                // console.dir(updates, { depth: null });
                 collection.bulkWrite(updates);
             }
         });

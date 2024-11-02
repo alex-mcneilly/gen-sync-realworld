@@ -26,7 +26,7 @@ export default class StateConcept {
             changes.push(...patches);
             inverseChanges.push(...inversePatches);
         });
-        console.dir(changes, { depth: null });
+        // console.dir(changes, { depth: null });
         return changes;
     }
     update(concept: string, diff: Patch[]) {
