@@ -33,10 +33,18 @@ export default class UserConcept {
         }
         return [state, sanitize(user)];
     }
+    getPublic(state: Users, user_id: string) {
+        const user = state[user_id];
+        if (user === undefined) {
+            throw Error("User not found");
+        }
+        return [state, sanitizePublic(user)];
+    }
     addMany(state: Users, entries: [string, object][]) {
         const added = entries.map(([id, obj]) => {
             const user = state[id];
-            const sanitized = user ? sanitize(user) : {};
+            // Listing multiple users is a public action
+            const sanitized = user ? sanitizePublic(user) : {};
             return [id, { ...obj, ...sanitized }];
         });
         return [state, added];
@@ -132,5 +140,11 @@ export default class UserConcept {
 function sanitize(user: User) {
     // deno-lint-ignore no-unused-vars
     const { password, ...rest } = user;
+    return rest;
+}
+// Emails are generally private, remove for public actions
+function sanitizePublic(user: User) {
+    // deno-lint-ignore no-unused-vars
+    const { password, email, ...rest } = user;
     return rest;
 }

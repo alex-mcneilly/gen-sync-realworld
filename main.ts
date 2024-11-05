@@ -49,9 +49,16 @@ const Operation = new OperationalConcept(operations);
 
 // Load synchronizations
 const base_path = import.meta.dirname;
-const sync_path = Deno.env.get("SYNC_FILE");
+const sync_path = Deno.env.get("SYNC_DIR");
 if (!base_path || !sync_path) throw Error("Path not found");
-const sync_file = Deno.readTextFileSync(path.join(base_path, sync_path));
+const sync_dir = path.join(base_path, sync_path);
+let sync_file = "";
+for await (const file of Deno.readDir(sync_dir)) {
+  if (path.extname(file.name) === ".sync") {
+    const file_path = path.join(sync_dir, file.name);
+    sync_file += await Deno.readTextFile(file_path) + "\n";
+  }
+}
 
 // Initialize synchronizer
 const Sync = new Synchronizer(

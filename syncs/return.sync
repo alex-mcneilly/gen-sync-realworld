@@ -1,0 +1,36 @@
+when API.return("user", user, profile, token, request_id)
+sync Map.mergeAs("user", user, profile, token) -> response
+     API.respond(response, request_id)
+
+when API.return("profile", user_id, target_id, request_id)
+sync User.getPublic(target_id) -> target_info
+     Profile.get(target_id) -> profile
+     Follows.doesFollow(user_id, target_id) -> follows
+     Map.mergeAs("profile", profile, target_info, follows) -> response
+     API.respond(response, request_id)
+
+when API.return("article", article_id, user_id, request_id)
+sync Article.get(article_id) -> article
+     Article.getAuthorId(article_id) -> author_id
+     User.getPublic(author_id) -> author
+     Follows.doesFollow(user_id, author_id) -> following
+     Profile.get(author_id) -> profile
+     Map.mergeAs("author", author, following, profile) -> author_info
+     Favorites.isFavorited(user_id, article_id) -> favorited
+     Favorites.favoritesCount(article_id) -> favoritesCount
+     Tag.get(article_id) -> tags
+     Map.mergeAs("article", article, tags, author_info, favorited, favoritesCount) -> response
+     API.respond(response, request_id)
+
+when API.return("articles", articles, user_id, limit, offset, request_id)
+sync Map.getKeys(articles, "author") -> author_ids
+     User.addMany(author_ids) -> added_user_info
+     Profile.addMany(added_user_info) -> added_profile_info
+     Follows.addMany(added_profile_info, user_id) -> added_follow_info
+     Map.updateKeys(added_follow_info, "author") -> author_profiles
+     Map.mergeValues(articles, author_profiles) -> result
+     Map.paginate(result, limit, offset) -> paginated
+     Map.countAs("articlesCount", paginated) -> article_count
+     Map.collectAs("articles", paginated) -> collected
+     Map.merge(collected, article_count) -> response
+     API.respond(response, request_id)

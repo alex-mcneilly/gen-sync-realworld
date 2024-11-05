@@ -19,9 +19,6 @@ export default class MapConcept {
         });
     }
     mergeValues(left: Entries, right: object[]) {
-        console.log("help");
-        console.dir(left, { depth: null });
-        console.dir(right, { depth: null });
         return left.map(([id, entry], idx) => {
             if (right[idx] === undefined) return [id, entry];
             const merged = { ...entry, ...right[idx] };

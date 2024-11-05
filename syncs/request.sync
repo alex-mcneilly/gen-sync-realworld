@@ -1,0 +1,82 @@
+when API.request("create_user", username, email, password) -> request_id
+sync User.signup(username, email, password) -> user_id
+     User.get(user_id) -> user
+     Profile.create(user_id) -> profile
+     JWT.make(user_id) -> token
+     API.return("user", user, profile, token, request_id)
+
+when API.request("login_user", email, password) -> request_id
+sync User.login(email, password) -> user_id
+     User.get(user_id) -> user
+     Profile.get(user_id) -> profile
+     JWT.make(user_id) -> token
+     API.return("user", user, profile, token, request_id)
+
+when API.request("get_user", token) -> request_id
+sync JWT.verify(token) -> user_id
+     User.get(user_id) -> user
+     Profile.get(user_id) -> profile
+     API.return("user", user, profile, token, request_id)
+
+when API.request("update_user", token, username, email, password, bio, image) -> request_id
+sync JWT.verify(token) -> user_id
+     User.update(user_id, username, email, password) -> user
+     Profile.update(user_id, bio, image) -> profile
+     API.return("user", user, profile, token, request_id)
+
+when API.request("get_profile", target) -> request_id
+sync User.usernameToId(target) -> target_id
+     API.return("profile", "", target_id, request_id)
+
+when API.request("get_profile", token, target) -> request_id
+sync JWT.verify(token) -> user_id
+     User.usernameToId(target) -> target_id
+     API.return("profile", user_id, target_id, request_id)
+
+when API.request("follow_user", token, target) -> request_id
+sync JWT.verify(token) -> user_id
+     User.usernameToId(target) -> target_id
+     Follows.create(user_id, target_id)
+     API.return("profile", user_id, target_id, request_id)
+
+when API.request("unfollow_user", token, target) -> request_id
+sync JWT.verify(token) -> user_id
+     User.usernameToId(target) -> target_id
+     Follows.delete(user_id, target_id)
+     API.return("profile", user_id, target_id, request_id)
+
+when API.request("list_articles", tag, author, favorited, limit, offset) -> request_id
+sync User.usernameToId(author) -> author_id
+     User.usernameToId(favorited) -> favorited_id
+     Article.allByAuthor(author_id) -> by_author
+     Favorites.byFavorited(by_author, "", favorited_id) -> by_favorited
+     Tag.byTag(by_favorited, tag) -> by_tag
+     API.return("articles", by_tag, "", limit, offset, request_id)
+
+when API.request("list_articles", token, tag, author, favorited, limit, offset) -> request_id
+sync JWT.verify(token) -> user_id
+     User.usernameToId(author) -> author_id
+     User.usernameToId(favorited) -> favorited_id
+     Article.allByAuthor(author_id) -> by_author
+     Favorites.byFavorited(by_author, user_id, favorited_id) -> by_favorited
+     Tag.byTag(by_favorited, tag) -> by_tag
+     API.return("articles", by_tag, user_id, limit, offset, request_id)
+
+when API.request("get_article", slug) -> request_id
+sync Article.getIdBySlug(slug) -> article_id
+     API.return("article", article_id, "", request_id)
+
+when API.request("get_article", token, slug) -> request_id
+sync JWT.verify(token) -> user_id
+     Article.getIdBySlug(slug) -> article_id
+     API.return("article", article_id, user_id, request_id)
+
+when API.request("create_article", token, title, description, body, tagList) -> request_id
+sync JWT.verify(token) -> user_id
+     Article.create(title, description, body, user_id) -> article_id
+     Tag.create(article_id, tagList)
+     API.return("article", article_id, user_id, request_id)
+
+when API.request("get_tags") -> request_id
+sync Tag.all() -> response
+     API.respond(response, request_id)

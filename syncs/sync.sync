@@ -12,14 +12,3 @@ sync Sync.execute(operation, arguments) -> returns
 when State.update(concept, diff)
      MongoDB.getCollection(concept) -> collection
 sync MongoDB.update(collection, diff)
-
-when API.request("feed_articles", token, limit, offset) -> request_id
-sync JWT.verify(token) -> user_id
-     Article.allByAuthor(author_id) -> by_author
-     Favorites.byFavorited(by_author, "", favorited_id) -> by_favorited
-     Tag.byTag(by_favorited, null) -> by_tag
-     Map.paginate(by_tag, limit, offset) -> paginated
-     Map.countAs("articlesCount", paginated) -> article_count
-     Map.collectAs("articles", paginated) -> collected
-     Map.merge(collected, article_count) -> response
-     API.respond(request_id, response)

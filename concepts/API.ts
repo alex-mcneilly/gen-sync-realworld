@@ -18,12 +18,16 @@ export default class APIConcept {
         state[id] = { id, created_epoch_ms, method, arguments: args };
         return [state, id];
     }
-    respond(state: Requests, request_id: string, response: object) {
+    respond(state: Requests, response: object, request_id: string) {
         const request = state[request_id];
         state[request_id] = {
             ...request,
             ...{ response, completed_epoch_ms: Date.now() },
         };
+        return [state];
+    }
+    // No-op synchronization, we could store the logical inputs if we wanted
+    return(state: Requests, ...[_args]: unknown[]) {
         return [state];
     }
 }
