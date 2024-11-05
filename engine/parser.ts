@@ -69,8 +69,6 @@ const toEndOfLine = pipeParsers([choice([regex(/^[^\S\r\n]*/), endOfInput])]);
 // Parse primitive values according to JSON specification
 const parseJsonValue = coroutine((run): unknown => {
   const value = run(everyCharUntil(anyOfString(",)\r\n")));
-  // Temporary hack for zero argument bindings
-  if (value.length === 0) return;
   return JSON.parse(value);
 });
 const booleanParser = choice([str("true"), str("false")]).map((b) =>
@@ -85,10 +83,21 @@ const returnBinding = pipeParsers([
   sepByComma(bindingOrValue),
 ]);
 
+// Match possibly empty
+const emptyList = coroutine((run) => {
+  run(str("()"));
+  return [];
+});
+const potentiallyEmpty = (p: Parser<unknown, string, unknown>) =>
+  choice([emptyList, p]);
+const argumentsList = potentiallyEmpty(
+  betweenParens(sepByComma(bindingOrValue)),
+);
+
 // A syncline consists of an action, argument bindings, and possible return bindings
 const syncLine = sequenceOf([
   binding,
-  betweenParens(sepByComma(bindingOrValue)),
+  argumentsList,
   possibly(returnBinding),
 ]);
 // Pad each syncline with optional whitespace

@@ -129,7 +129,7 @@ sync JWT.verify(token) -> user_id
      API.respond(request_id, response)
 
 when API.request("get_tags") -> request_id
-sync Tag.all("") -> response
+sync Tag.all() -> response
      API.respond(request_id, response)
 
 when Sync.run(action, arguments)
