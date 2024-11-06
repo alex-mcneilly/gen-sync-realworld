@@ -36,11 +36,16 @@ export default class MongoDBConcept {
         });
         json_patches.forEach(async ([id, patch]) => {
             if ((patch instanceof ObjectId)) return;
+            // Json patch conversion doesn't work for base path
             if (patch.path === "") {
-                const copied = JSON.parse(JSON.stringify(patch.value));
-                await collection.updateOne({ _id: id }, { $set: copied }, {
-                    upsert: true,
-                });
+                if (patch.op === "remove") {
+                    await collection.deleteOne({ _id: id });
+                } else {
+                    const copied = JSON.parse(JSON.stringify(patch.value));
+                    await collection.updateOne({ _id: id }, { $set: copied }, {
+                        upsert: true,
+                    });
+                }
             } else {
                 const updates = await jsonPatchToMongoDbOps([
                     patch as Operation,

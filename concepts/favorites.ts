@@ -1,7 +1,7 @@
-// {user_id: [target_id]}
 interface Favorite {
     favorited: string[];
 }
+// {user_id: [target_id]}
 type Favorites = Record<string, Favorite>;
 
 export default class FavoritesConcept {

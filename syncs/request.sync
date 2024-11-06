@@ -48,7 +48,7 @@ sync JWT.verify(token) -> user_id
 when API.request("list_articles", tag, author, favorited, limit, offset) -> request_id
 sync User.usernameToId(author) -> author_id
      User.usernameToId(favorited) -> favorited_id
-     Article.allByAuthor(author_id) -> by_author
+     Article.byAuthor(author_id) -> by_author
      Favorites.byFavorited(by_author, "", favorited_id) -> by_favorited
      Tag.byTag(by_favorited, tag) -> by_tag
      API.return("articles", by_tag, "", limit, offset, request_id)
@@ -57,10 +57,16 @@ when API.request("list_articles", token, tag, author, favorited, limit, offset) 
 sync JWT.verify(token) -> user_id
      User.usernameToId(author) -> author_id
      User.usernameToId(favorited) -> favorited_id
-     Article.allByAuthor(author_id) -> by_author
+     Article.byAuthor(author_id) -> by_author
      Favorites.byFavorited(by_author, user_id, favorited_id) -> by_favorited
      Tag.byTag(by_favorited, tag) -> by_tag
      API.return("articles", by_tag, user_id, limit, offset, request_id)
+
+when API.request("get_feed", token, limit, offset) -> request_id
+sync JWT.verify(token) -> user_id
+     Follows.get(user_id) -> following
+     Article.byAuthors(following) -> by_authors
+     API.return("articles", by_authors, user_id, limit, offset, request_id)
 
 when API.request("get_article", slug) -> request_id
 sync Article.getIdBySlug(slug) -> article_id
@@ -76,6 +82,59 @@ sync JWT.verify(token) -> user_id
      Article.create(title, description, body, user_id) -> article_id
      Tag.create(article_id, tagList)
      API.return("article", article_id, user_id, request_id)
+
+when API.request("update_article", token, slug, title, description, body) -> request_id
+sync JWT.verify(token) -> user_id
+     Article.getIdBySlug(slug) -> article_id
+     Article.update(article_id, title, description, body)
+     API.return("article", article_id, user_id, request_id)
+
+when API.request("delete_article", token, slug) -> request_id
+sync JWT.verify(token) -> user_id
+     Article.getIdBySlug(slug) -> article_id
+     Article.delete(article_id)
+     API.respond("Article deleted", request_id)
+
+when API.request("create_comment", token, slug, body) -> request_id
+sync JWT.verify(token) -> user_id
+     Article.getIdBySlug(slug) -> article_id
+     Comment.create(article_id, body, user_id) -> comment_id
+     API.return("comment", comment_id, user_id, request_id)
+
+when API.request("get_comments", token, slug) -> request_id
+sync JWT.verify(token) -> user_id
+     Article.getIdBySlug(slug) -> article_id
+     Comment.byTarget(article_id) -> comments
+     API.return("comments", comments, user_id, request_id)
+
+when API.request("get_comments", slug) -> request_id
+sync Article.getIdBySlug(slug) -> article_id
+     Comment.byTarget(article_id) -> comments
+     API.return("comments", comments, "", request_id)
+
+when API.request("delete_comment", token, comment_id) -> request_id
+sync JWT.verify(token) -> user_id
+     Comment.delete(comment_id)
+     API.respond("Comment deleted", request_id)
+
+when API.request("favorite_article", token, slug) -> request_id
+sync JWT.verify(token) -> user_id
+     Article.getIdBySlug(slug) -> article_id
+     Favorites.create(user_id, article_id)
+     API.return("article", article_id, user_id, request_id)
+
+when API.request("unfavorite_article", token, slug) -> request_id
+sync JWT.verify(token) -> user_id
+     Article.getIdBySlug(slug) -> article_id
+     Favorites.delete(user_id, article_id)
+     API.return("article", article_id, user_id, request_id)
+
+when Article.delete(article_id)
+sync Comment.byTarget(article_id) -> comments
+     Comment.deleteMany(comments)
+
+when Article.delete(article_id)
+sync Tag.delete(article_id)
 
 when API.request("get_tags") -> request_id
 sync Tag.all() -> response

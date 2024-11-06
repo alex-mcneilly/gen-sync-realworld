@@ -34,3 +34,23 @@ sync Map.getKeys(articles, "author") -> author_ids
      Map.collectAs("articles", paginated) -> collected
      Map.merge(collected, article_count) -> response
      API.respond(response, request_id)
+
+when API.return("comment", comment_id, user_id, request_id)
+sync Comment.get(comment_id) -> comment
+     Comment.getAuthorId(comment_id) -> author_id
+     User.getPublic(author_id) -> author
+     Follows.doesFollow(user_id, author_id) -> following
+     Profile.get(author_id) -> profile
+     Map.mergeAs("author", author, following, profile) -> author_info
+     Map.mergeAs("comment", comment, author_info) -> response
+     API.respond(response, request_id)
+
+when API.return("comments", comments, user_id, request_id)
+sync Map.getKeys(comments, "author") -> author_ids
+     User.addMany(author_ids) -> added_user_info
+     Profile.addMany(added_user_info) -> added_profile_info
+     Follows.addMany(added_profile_info, user_id) -> added_follow_info
+     Map.updateKeys(added_follow_info, "author") -> author_profiles
+     Map.mergeValues(comments, author_profiles) -> result
+     Map.collectAs("comments", result) -> response
+     API.respond(response, request_id)

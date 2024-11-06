@@ -1,7 +1,7 @@
-// {user_id: [target_id]}
 interface Tag {
     tagList: string[];
 }
+// {article_id: [tags]}
 type Tags = Record<string, Tag>;
 
 export default class TagConcept {
@@ -20,6 +20,10 @@ export default class TagConcept {
     }
     get(state: Tags, from_id: string) {
         return [state, state[from_id]];
+    }
+    delete(state: Tags, from_id: string) {
+        delete state[from_id];
+        return [state];
     }
     all(state: Tags, _: unknown) {
         const tags = new Set();

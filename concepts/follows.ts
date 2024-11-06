@@ -1,7 +1,7 @@
-// {user_id: [target_id]}
 interface Follow {
     following: string[];
 }
+// {user_id: [target_id]}
 type Follows = Record<string, Follow>;
 
 export default class FollowsConcept {
@@ -39,5 +39,12 @@ export default class FollowsConcept {
             return [id, { ...obj, ...follows }];
         });
         return [state, added];
+    }
+    get(state: Follows, user_id: string) {
+        const found = state[user_id];
+        if (found === undefined) {
+            return [state, []];
+        }
+        return [state, found.following];
     }
 }

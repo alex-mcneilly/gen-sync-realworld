@@ -11,6 +11,7 @@ import FollowsConcept from "./concepts/follows.ts";
 import ArticleConcept from "./concepts/article.ts";
 import TagConcept from "./concepts/tag.ts";
 import FavoritesConcept from "./concepts/favorites.ts";
+import CommentConcept from "./concepts/comment.ts";
 
 // Operational concept imports
 import JWTConcept from "./operational/JWT.ts";
@@ -28,6 +29,7 @@ const Follows = new FollowsConcept();
 const Article = new ArticleConcept();
 const Tag = new TagConcept();
 const Favorites = new FavoritesConcept();
+const Comment = new CommentConcept();
 const JWT = new JWTConcept();
 const Mapping = new MapConcept();
 const Concept = new ConceptConcept();
@@ -41,6 +43,7 @@ const states = {
   Article: {},
   Tag: {},
   Favorites: {},
+  Comment: {},
 };
 const State = new StateConcept(states);
 // Initialize operations
@@ -70,6 +73,7 @@ const Sync = new Synchronizer(
     Article,
     Tag,
     Favorites,
+    Comment,
     JWT,
     Mapping,
     Concept,
@@ -100,6 +104,7 @@ async function makeRequest(action: string, ...args: unknown[]) {
   //   return response;
   // }
 }
+
 // console.dir(Sync.syncs, { depth: null });
 function getToken(ctx: Context) {
   const header = ctx.req.header("Authorization");
@@ -114,12 +119,7 @@ const app = new Hono();
 
 app.post("/users", async (ctx) => {
   const { user: { username, email, password } } = await ctx.req.json();
-  const response = await makeRequest(
-    "create_user",
-    username,
-    email,
-    password,
-  );
+  const response = await makeRequest("create_user", username, email, password);
   return ctx.json(response);
 });
 
@@ -228,15 +228,85 @@ app.post("/articles", async (ctx) => {
   return ctx.json(response);
 });
 
+app.get("/articles/feed", async (ctx) => {
+  const { limit, offset } = ctx.req.query();
+  const token = getToken(ctx);
+  const response = await makeRequest("get_feed", { token }, limit, offset);
+  return ctx.json(response);
+});
+
 app.get("/articles/:slug", async (ctx) => {
   const slug = ctx.req.param("slug");
   const response = await makeRequest("get_article", slug);
   return ctx.json(response);
 });
 
+app.put("/articles/:slug", async (ctx) => {
+  const slug = ctx.req.param("slug");
+  const { article: { title, description, body } } = await ctx.req
+    .json();
+  const token = getToken(ctx);
+  const response = await makeRequest(
+    "update_article",
+    { token },
+    slug,
+    title,
+    description,
+    body,
+  );
+  return ctx.json(response);
+});
+
+app.delete("/articles/:slug", async (ctx) => {
+  const slug = ctx.req.param("slug");
+  const token = getToken(ctx);
+  const response = await makeRequest("delete_article", { token }, slug);
+  return ctx.json(response);
+});
+
+app.post("/articles/:slug/comments", async (ctx) => {
+  const slug = ctx.req.param("slug");
+  const token = getToken(ctx);
+  const { comment: { body } } = await ctx.req.json();
+  const response = await makeRequest("create_comment", { token }, slug, body);
+  return ctx.json(response);
+});
+
 app.get("/articles/:slug/comments", async (ctx) => {
   const slug = ctx.req.param("slug");
-  return ctx.json({ comments: [] });
+  let response, token;
+  try {
+    token = getToken(ctx);
+  } catch {
+    token = undefined;
+  }
+  if (token === undefined) {
+    response = await makeRequest("get_comments", slug);
+  } else {
+    response = await makeRequest("get_comments", { token }, slug);
+  }
+  return ctx.json(response);
+});
+
+app.delete("/articles/:slug/comments/:id", async (ctx) => {
+  const comment_id = ctx.req.param("id");
+  const token = getToken(ctx);
+  const response = await makeRequest("delete_comment", { token }, comment_id);
+  return ctx.json(response);
+});
+
+app.post("/articles/:slug/favorite", async (ctx) => {
+  const slug = ctx.req.param("slug");
+  const token = getToken(ctx);
+  const response = await makeRequest("favorite_article", { token }, slug);
+  return ctx.json(response);
+});
+
+app.delete("/articles/:slug/favorite", async (ctx) => {
+  const slug = ctx.req.param("slug");
+  const token = getToken(ctx);
+  const response = await makeRequest("unfavorite_article", { token }, slug);
+  return ctx.json(response);
 });
 
 app.get("/tags", async (ctx) => {
