@@ -83,10 +83,11 @@ sync JWT.verify(token) -> user_id
      Tag.create(article_id, tagList)
      API.return("article", article_id, user_id, request_id)
 
-when API.request("update_article", token, slug, title, description, body) -> request_id
+when API.request("update_article", token, slug, title, description, body, tagList) -> request_id
 sync JWT.verify(token) -> user_id
      Article.getIdBySlug(slug) -> article_id
      Article.update(article_id, title, description, body)
+     Tag.update(article_id, tagList)
      API.return("article", article_id, user_id, request_id)
 
 when API.request("delete_article", token, slug) -> request_id

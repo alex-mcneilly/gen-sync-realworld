@@ -25,6 +25,10 @@ export default class TagConcept {
         delete state[from_id];
         return [state];
     }
+    update(state: Tags, from_id: string, tagList: string[]) {
+        state[from_id] = { tagList };
+        return [state];
+    }
     all(state: Tags, _: unknown) {
         const tags = new Set();
         Object.values(state).forEach((tag) => {

@@ -243,7 +243,7 @@ app.get("/articles/:slug", async (ctx) => {
 
 app.put("/articles/:slug", async (ctx) => {
   const slug = ctx.req.param("slug");
-  const { article: { title, description, body } } = await ctx.req
+  const { article: { title, description, body, tagList } } = await ctx.req
     .json();
   const token = getToken(ctx);
   const response = await makeRequest(
@@ -253,6 +253,7 @@ app.put("/articles/:slug", async (ctx) => {
     title,
     description,
     body,
+    tagList,
   );
   return ctx.json(response);
 });
