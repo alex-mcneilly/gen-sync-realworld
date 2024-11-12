@@ -1,0 +1,7 @@
+when Article.create(title, description, body, user_id) -> article_id
+     OpenAI.isPrompt(body) -> true
+sync OpenAI.basePrompt() -> messages
+     OpenAI.addArticlePrompt(messages) -> system_prompt
+     OpenAI.addUserMessage(system_prompt, body) -> prompt
+     OpenAI.getSingleResponse(prompt) -> generated
+     Article.update(article_id, title, description, generated)

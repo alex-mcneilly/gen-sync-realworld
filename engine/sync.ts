@@ -236,7 +236,6 @@ export default class SyncConcept {
   }
   public async run(action: string, actionArgs: unknown[]) {
     // Run once and return the result of the first action
-    // const result = await this.actionMap[action](...actionArgs);
     const metaRun = this.metaRun.bind(this);
     const result = await metaRun(action, actionArgs);
     const trace: ExecutedActionTrace = [action, actionArgs, result];

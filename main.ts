@@ -20,6 +20,7 @@ import ConceptConcept from "./operational/concept.ts";
 import StateConcept from "./operational/state.ts";
 import OperationalConcept from "./operational/operational.ts";
 import MongoDBConcept from "./operational/MongoDB.ts";
+import OpenAIConcept from "./operational/openai.ts";
 
 // Initialize concepts
 const API = new APIConcept();
@@ -34,6 +35,7 @@ const JWT = new JWTConcept();
 const Mapping = new MapConcept();
 const Concept = new ConceptConcept();
 const MongoDB = new MongoDBConcept();
+const OpenAI = new OpenAIConcept();
 // Initialize state
 const states = {
   User: {},
@@ -45,9 +47,12 @@ const states = {
   Favorites: {},
   Comment: {},
 };
+// Load from MongoDB
+await MongoDB.initialize(states);
+// console.log(states);
 const State = new StateConcept(states);
 // Initialize operations
-const operations = ["JWT", "Map"];
+const operations = ["JWT", "Map", "OpenAI"];
 const Operation = new OperationalConcept(operations);
 
 // Load synchronizations
@@ -80,6 +85,7 @@ const Sync = new Synchronizer(
     State,
     Operation,
     MongoDB,
+    OpenAI,
   ],
   sync_file,
 );

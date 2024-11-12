@@ -27,6 +27,19 @@ export default class MongoDBConcept {
     getCollection(concept: string) {
         return concept + "Table";
     }
+    async initialize(states: Record<string, Record<string, unknown>>) {
+        const entries = Object.entries(states);
+        for (const entry of entries) {
+            const [coll, state] = entry;
+            const collection = db.collection(this.getCollection(coll));
+            const all_documents = await collection.find().toArray();
+            all_documents.forEach((doc) => {
+                const { _id, ...rest } = doc;
+                const id = _id.toString();
+                state[id] = rest;
+            });
+        }
+    }
     update(collection_name: string, diff: Patch[]) {
         const collection = db.collection(collection_name);
         const json_patches = diff.map((patch) => {
