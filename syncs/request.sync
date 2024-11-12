@@ -1,28 +1,23 @@
 when API.request("create_user", username, email, password) -> request_id
 sync User.signup(username, email, password) -> user_id
-     User.get(user_id) -> user
-     Profile.create(user_id) -> profile
+     Profile.create(user_id)
      JWT.make(user_id) -> token
-     API.return("user", user, profile, token, request_id)
+     API.return("user", user_id, token, request_id)
 
 when API.request("login_user", email, password) -> request_id
 sync User.login(email, password) -> user_id
-     User.get(user_id) -> user
-     Profile.get(user_id) -> profile
      JWT.make(user_id) -> token
-     API.return("user", user, profile, token, request_id)
+     API.return("user", user_id, token, request_id)
 
 when API.request("get_user", token) -> request_id
 sync JWT.verify(token) -> user_id
-     User.get(user_id) -> user
-     Profile.get(user_id) -> profile
-     API.return("user", user, profile, token, request_id)
+     API.return("user", user_id, token, request_id)
 
 when API.request("update_user", token, username, email, password, bio, image) -> request_id
 sync JWT.verify(token) -> user_id
-     User.update(user_id, username, email, password) -> user
-     Profile.update(user_id, bio, image) -> profile
-     API.return("user", user, profile, token, request_id)
+     User.update(user_id, username, email, password)
+     Profile.update(user_id, bio, image)
+     API.return("user", user_id, token, request_id)
 
 when API.request("get_profile", target) -> request_id
 sync User.usernameToId(target) -> target_id

@@ -1,5 +1,7 @@
-when API.return("user", user, profile, token, request_id)
-sync Map.mergeAs("user", user, profile, token) -> response
+when API.return("user", user_id, token, request_id)
+sync User.get(user_id) -> user
+     Profile.get(user_id) -> profile
+     Map.mergeAs("user", user, profile, token) -> response
      API.respond(response, request_id)
 
 when API.return("profile", user_id, target_id, request_id)
