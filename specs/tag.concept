@@ -1,0 +1,50 @@
+<concept name="TagConcept">
+  <purpose>Categorizes content with relevant identifiers</purpose>
+  <state>
+    <component code_name="tags" code_datatype="Record<string, { tagList: string[] }>">
+      Maps each content item (from_id) to its list of tags
+    </component>
+  </state>
+  <actions>
+    <action>
+      <name>create</name>
+      <precondition>Valid from_id for a content item</precondition>
+      <effect>Initializes the tag list for the given content item</effect>
+    </action>
+    <action>
+      <name>isTagged</name>
+      <precondition>None (returns false if content item not found)</precondition>
+      <effect>Checks whether the specified content item includes a given tag</effect>
+    </action>
+    <action>
+      <name>get</name>
+      <precondition>None</precondition>
+      <effect>Retrieves the list of tags for the specified content item</effect>
+    </action>
+    <action>
+      <name>delete</name>
+      <precondition>None</precondition>
+      <effect>Removes the specified content item’s tag list entirely</effect>
+    </action>
+    <action>
+      <name>update</name>
+      <precondition>Content item exists</precondition>
+      <effect>Replaces the entire tag list for the specified content item</effect>
+    </action>
+    <action>
+      <name>all</name>
+      <precondition>None</precondition>
+      <effect>Collects a distinct set of all tags from all items</effect>
+    </action>
+    <action>
+      <name>byTag</name>
+      <precondition>None</precondition>
+      <effect>Filters a list of content items by an optional tag</effect>
+    </action>
+  </actions>
+  <operationalPrinciple>
+    Each content item can have zero or more tags, which can be created, retrieved, 
+    updated, or deleted. The system can also determine if a specific tag exists, 
+    get all tags in aggregate, and filter items based on a given tag.
+  </operationalPrinciple>
+</concept>

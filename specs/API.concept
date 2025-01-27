@@ -1,0 +1,28 @@
+<concept name="APIConcept">
+  <purpose>Manages ephemeral requests for method calls and responses</purpose>
+  <state>
+    <type>Requests</type>
+  </state>
+  <actions>
+    <action>
+      <name>request</name>
+      <precondition>Method must be a non-empty string</precondition>
+      <effect>Creates a new request with UUID, timestamp, method, and arguments</effect>
+    </action>
+    <action>
+      <name>respond</name>
+      <precondition>Request with the given request_id exists</precondition>
+      <effect>Updates the request with a response object and completion time</effect>
+    </action>
+    <action>
+      <name>return</name>
+      <precondition>None</precondition>
+      <effect>No-op (returns the current state)</effect>
+    </action>
+  </actions>
+  <operationalPrinciple>
+    Clients can make requests to APIs with specific endpoints, parameters, and data, 
+    which are processed using defined methods. Servers receive these requests, execute
+    the corresponding operations, and return responses with status codes and payloads.
+  </operationalPrinciple>
+</concept>

@@ -1,0 +1,66 @@
+<concept name="UserConcept">
+  <purpose>Manages user accounts: registration, authentication, and profile information</purpose>
+  <state>
+    <component code_name="users" code_datatype="Record<string, { username: string; password: string; email: string }>">
+      Stores user records keyed by unique user_id
+    </component>
+  </state>
+  <actions>
+    <action>
+      <name>signup</name>
+      <precondition>Username and email are unique; username and password are non-empty</precondition>
+      <effect>Creates a user entry with a hashed password</effect>
+    </action>
+    <action>
+      <name>get</name>
+      <precondition>user_id exists</precondition>
+      <effect>Retrieves user data without the password</effect>
+    </action>
+    <action>
+      <name>getPublic</name>
+      <precondition>user_id exists</precondition>
+      <effect>Retrieves user data without password and email</effect>
+    </action>
+    <action>
+      <name>addMany</name>
+      <precondition>None</precondition>
+      <effect>Appends sanitized public info of multiple users to the given entries</effect>
+    </action>
+    <action>
+      <name>getByUsername</name>
+      <precondition>username corresponds to an existing user</precondition>
+      <effect>Retrieves sanitized user data for the specified username</effect>
+    </action>
+    <action>
+      <name>getByEmail</name>
+      <precondition>email corresponds to an existing user</precondition>
+      <effect>Finds user entry (including password) by email</effect>
+    </action>
+    <action>
+      <name>usernameToId</name>
+      <precondition>None (may return undefined if username not found)</precondition>
+      <effect>Finds user_id corresponding to a username</effect>
+    </action>
+    <action>
+      <name>checkUnique</name>
+      <precondition>None</precondition>
+      <effect>Checks for existing user with same username or email; throws if found</effect>
+    </action>
+    <action>
+      <name>login</name>
+      <precondition>User with provided email exists, and password must match</precondition>
+      <effect>Verifies user’s password and returns user_id on success</effect>
+    </action>
+    <action>
+      <name>update</name>
+      <precondition>user_id exists</precondition>
+      <effect>Updates username, email, or password as provided, verifying uniqueness where needed</effect>
+    </action>
+  </actions>
+  <operationalPrinciple>
+    Users can sign up with a unique username and email, storing a hashed password.
+    They can log in, retrieve their account details, and update information. 
+    Public details exclude password and email, while full details may be returned 
+    for authenticated operations.
+  </operationalPrinciple>
+</concept>

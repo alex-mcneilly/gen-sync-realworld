@@ -1,0 +1,53 @@
+<concept name="ArticleConcept">
+<purpose>Manages articles authored by users</purpose>
+  <state>
+    <component code_name="articles" code_datatype="Record<string, Article>">
+      Stores article objects (slug, title, description, body, timestamps, author)
+    </component>
+  </state>
+  <actions>
+    <action>
+      <name>create</name>
+      <precondition>User provides valid article data</precondition>
+      <effect>Generates a new article with a unique ID, slug, and timestamps</effect>
+    </action>
+    <action>
+      <name>get</name>
+      <precondition>Requested article exists</precondition>
+      <effect>Retrieves the article by its ID</effect>
+    </action>
+    <action>
+      <name>update</name>
+      <precondition>Requested article exists</precondition>
+      <effect>Modifies the article fields, updates slug/title/body/description/timestamp</effect>
+    </action>
+    <action>
+      <name>delete</name>
+      <precondition>Requested article exists</precondition>
+      <effect>Removes the article from the store</effect>
+    </action>
+    <action>
+      <name>getAuthorId</name>
+      <precondition>Requested article exists</precondition>
+      <effect>Returns the ID of the article’s author</effect>
+    </action>
+    <action>
+      <name>getIdBySlug</name>
+      <precondition>Article with matching slug exists</precondition>
+      <effect>Finds the article’s ID using its slug</effect>
+    </action>
+    <action>
+      <name>byAuthor</name>
+      <precondition>None</precondition>
+      <effect>Retrieves all articles by a given author, or all if none specified</effect>
+    </action>
+    <action>
+      <name>byAuthors</name>
+      <precondition>None</precondition>
+      <effect>Retrieves articles by a list of author IDs</effect>
+    </action>
+  </actions>
+  <operationalPrinciple>
+    Articles are created with a unique ID and slug. They can be retrieved, updated, deleted, and filtered by author.
+  </operationalPrinciple>
+</concept>

@@ -1,0 +1,45 @@
+<concept name="CommentConcept">
+  <purpose>Enables users to handle comments for content</purpose>
+  <state>
+    <component code_name="comments" code_datatype="Record<string, Comment>">
+      Stores comment objects (id, target, body, timestamps, author)
+    </component>
+  </state>
+  <actions>
+    <action>
+      <name>create</name>
+      <precondition>Authenticated user and existing content source</precondition>
+      <effect>Creates a new comment referencing the provided target</effect>
+    </action>
+    <action>
+      <name>get</name>
+      <precondition>Comment with given ID exists</precondition>
+      <effect>Retrieves the specified comment’s data (omitting author in return)</effect>
+    </action>
+    <action>
+      <name>delete</name>
+      <precondition>Authenticated user is the author of the comment</precondition>
+      <effect>Removes the specified comment from the store</effect>
+    </action>
+    <action>
+      <name>deleteMany</name>
+      <precondition>Authenticated user can bulk-delete the given comments</precondition>
+      <effect>Removes multiple comments from the store</effect>
+    </action>
+    <action>
+      <name>getAuthorId</name>
+      <precondition>Comment with given ID exists</precondition>
+      <effect>Returns the author of the specified comment</effect>
+    </action>
+    <action>
+      <name>byTarget</name>
+      <precondition>Valid target ID is provided</precondition>
+      <effect>Retrieves all comments referencing the specified target</effect>
+    </action>
+  </actions>
+  <operationalPrinciple>
+    Authenticated users create comments on content, which are stored and can be retrieved,
+    deleted individually or in bulk. Target references identify the relevant content item,
+    and the author field tracks the commenter.
+  </operationalPrinciple>
+</concept>

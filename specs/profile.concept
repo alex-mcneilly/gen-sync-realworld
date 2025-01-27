@@ -1,0 +1,34 @@
+<concept name="ProfileConcept">
+  <purpose>Stores and displays biographical information publicly</purpose>
+  <state>
+    <component code_name="profiles" code_datatype="Record<string, Profile>">
+      Tracks each user's profile (bio, image)
+    </component>
+  </state>
+  <actions>
+    <action>
+      <name>create</name>
+      <precondition>User is authenticated</precondition>
+      <effect>Initializes the profile of a user with empty fields</effect>
+    </action>
+    <action>
+      <name>get</name>
+      <precondition>Profile for the specified user_id exists</precondition>
+      <effect>Retrieves the user’s profile data</effect>
+    </action>
+    <action>
+      <name>addMany</name>
+      <precondition>None</precondition>
+      <effect>Augments a list of entries with profile information if available</effect>
+    </action>
+    <action>
+      <name>update</name>
+      <precondition>Profile for the specified user exists</precondition>
+      <effect>Updates the bio and/or image fields in a user’s profile</effect>
+    </action>
+  </actions>
+  <operationalPrinciple>
+    When a user is authenticated, they can create or update their profile, 
+    and others can view the stored information.
+  </operationalPrinciple>
+</concept>

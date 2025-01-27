@@ -1,0 +1,41 @@
+<concept name="FavoritesConcept">
+  <purpose>Enables users to favorite or unfavorite content sources</purpose>
+  <state>
+    <component code_name="favorites" code_datatype="Record<string, { favorited: string[] }>">
+      Mapping of users to a list of favorited items
+    </component>
+  </state>
+  <actions>
+    <action>
+      <name>create</name>
+      <precondition>Authenticated user and existing target_id</precondition>
+      <effect>Adds target_id to the user’s favorites (if not already present)</effect>
+    </action>
+    <action>
+      <name>delete</name>
+      <precondition>User has favorited the target_id</precondition>
+      <effect>Removes the target from the user’s favorites</effect>
+    </action>
+    <action>
+      <name>isFavorited</name>
+      <precondition>Valid user_id</precondition>
+      <effect>Checks if the given user has favorited the specified target</effect>
+    </action>
+    <action>
+      <name>favoritesCount</name>
+      <precondition>Valid target_id</precondition>
+      <effect>Counts how many users have favorited the specified item</effect>
+    </action>
+    <action>
+      <name>byFavorited</name>
+      <precondition>None</precondition>
+      <effect>Filters a list of entries by whether or not they are favorited by a user or optional “favorited_id” user</effect>
+    </action>
+  </actions>
+  <operationalPrinciple>
+    Authenticated users can add or remove content from their favorites, 
+    check if a target is currently favorited, 
+    see how many users have favorited a target, 
+    and filter items by favorited status.
+  </operationalPrinciple>
+</concept>

@@ -1,0 +1,39 @@
+<concept name="FollowsConcept">
+  <purpose>Enables following or unfollowing of other users, allowing users to see updates from those they follow</purpose>
+  <state>
+    <component code_name="follows" code_datatype="Record<string, { following: string[] }>">
+      Maps each user to a list of IDs representing those they follow
+    </component>
+  </state>
+  <actions>
+    <action>
+      <name>create</name>
+      <precondition>Authenticated user and valid target_id</precondition>
+      <effect>Adds the target user_id to the user’s following list (if not already present)</effect>
+    </action>
+    <action>
+      <name>delete</name>
+      <precondition>User is following the target_id</precondition>
+      <effect>Removes the target_id from the user’s following list</effect>
+    </action>
+    <action>
+      <name>doesFollow</name>
+      <precondition>Valid user_id and target_id</precondition>
+      <effect>Checks if the user currently follows the target_id</effect>
+    </action>
+    <action>
+      <name>addMany</name>
+      <precondition>None</precondition>
+      <effect>Marks a list of entries with whether the user follows each item</effect>
+    </action>
+    <action>
+      <name>get</name>
+      <precondition>None</precondition>
+      <effect>Retrieves the list of all target_ids that a user follows</effect>
+    </action>
+  </actions>
+  <operationalPrinciple>
+    Authenticated users can follow or unfollow others, check follow status,
+    augment data sets to indicate follow relationships, and retrieve their followed list.
+  </operationalPrinciple>
+</concept>
