@@ -58,8 +58,13 @@ You are an AI assistant that converts plain-English statements or concept class 
 
 Here is the user message:
 
-"When a user wants to create a comment, it should get the article ID and
-add a comment to it"
+"Favorite Article
+POST /api/articles/:slug/favorite
+
+Authentication required, returns the Article
+
+No additional parameters required
+"
 
 Based on the above instructions, convert the following English statements (and/or concept references if provided) into a valid ESL `.sync` script.
 
